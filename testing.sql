@@ -1,7 +1,9 @@
 -----TESTING Y PRUEBAS-----
 
+USE CureSA
+go
 --Realizamos los select para comprobar las tablas con datos cargados
---Ejecución de los SP
+--Ejecuciï¿½n de los SP
 EXEC Normalizacion.cargarTablaPrestador;
 GO
 EXEC Normalizacion.cargarTablaSedes
@@ -29,8 +31,8 @@ GO
 	--Ejemplo de insercion
 	EXEC ManejoDeDatos.InsertarPacienteConDomicilio
     @nombre = 'Juan',
-    @apellido = 'Pérez',
-    @apellido_materno = 'Gómez',
+    @apellido = 'Pï¿½rez',
+    @apellido_materno = 'Gï¿½mez',
     @fecha_de_nacimiento = '1988-03-15',
     @tipo_documento = 'DNI',
     @nro_documento = '98765431',
@@ -63,8 +65,8 @@ GO
 
 EXEC ManejoDeDatos.ModificarDatosPaciente
 @id_historia_clinica = 1,   --Aca indico el numero de la historia clinica del paciente a modificar
-@telefono_fijo = '011-8888-8888', -- Nuevo número de teléfono fijo
-@mail = 'juan.perez.nuevo@yahoo.com', -- Nuevo correo electrónico
+@telefono_fijo = '011-8888-8888', -- Nuevo nï¿½mero de telï¿½fono fijo
+@mail = 'juan.perez.nuevo@yahoo.com', -- Nuevo correo electrï¿½nico
 @calle_y_numero = 'Nueva Calle 200', -- Nuevo domicilio
 @piso = '2',
 @departamento = 'B',
@@ -90,12 +92,12 @@ GO
 
 
 
---- Ejemplo de ejecucion para el cambio de contraseña del usuario
+--- Ejemplo de ejecucion para el cambio de contraseï¿½a del usuario
 	
 	
-EXEC ManejoDeDatos.CambiarContraseñaUsuario
-@id_usuario = 1, -- ID del usuario que quiere modificar la contraseña
-@nueva_contraseña = 'contraseña' -- Nueva contraseña
+EXEC ManejoDeDatos.CambiarContraseï¿½aUsuario
+@id_usuario = 1, -- ID del usuario que quiere modificar la contraseï¿½a
+@nueva_contraseï¿½a = 'contraseï¿½a' -- Nueva contraseï¿½a
 GO
 
 select * from Sistema.Usuario
@@ -120,13 +122,18 @@ EXEC ManejoDeDatos.EliminarPrestador
 GO
 
 
---Ejemplo para añadir especialidad
+--Ejemplo para aï¿½adir especialidad
 
 EXEC ManejoDeDatos.AgregarEspecialidad
-    @nombre_especialidad = 'CARDIOLOGÍA'  -- nombre de la especialidad
+    @nombre_especialidad = 'CARDIOLOGï¿½A'  -- nombre de la especialidad
 GO
 
 select * from Sistema.Especialidad
+GO
+
+--Ejemplo para validaciÃ³n en caso de repeticiÃ³n
+EXEC ManejoDeDatos.AgregarEspecialidad
+    @nombre_especialidad = 'CARDIOLOGï¿½A'  -- nombre de la especialidad
 GO
 
 
@@ -141,10 +148,10 @@ GO
 
 
 
--- Ejemplo de ejecucion para insertar un nuevo médico
+-- Ejemplo de ejecucion para insertar un nuevo mï¿½dico
 EXEC ManejoDeDatos.InsertarMedico
 @nombre = 'Juan',
-@apellido = 'Pérez',
+@apellido = 'Pï¿½rez',
 @numero_matricula = 12345,
 @id_especialidad = 1  -- ID de la especialidad
 GO
@@ -153,11 +160,11 @@ SELECT * FROM Sistema.Medico
 GO
 
 
--- Ejemplo de ejecucion para modificar un nuevo médico
+-- Ejemplo de ejecucion para modificar un nuevo mï¿½dico
 EXEC ManejoDeDatos.ModificarMedico
 @id = 2,
 @nombre = 'Juan',
-@apellido = 'Pérez',
+@apellido = 'Pï¿½rez',
 @numero_matricula = 123456,
 @id_especialidad = 1  -- ID de la especialidad
 GO
@@ -167,22 +174,22 @@ GO
 
 
 
--- Ejemplo de eliminar un médico por su ID
+-- Ejemplo de eliminar un mï¿½dico por su ID
 	
 EXEC ManejoDeDatos.EliminarMedico
- @id_medico = 2  -- ID del médico a eliminar
+ @id_medico = 2  -- ID del mï¿½dico a eliminar
 GO
 
 SELECT * FROM Sistema.Medico
 GO
 
 
---Ejecución de prueba de xml
+--Ejecuciï¿½n de prueba de xml
 exec Sistema.generarArchivoXml @fecha_inicio = '2023-10-01', @fecha_fin = '2023-10-08';
 GO
 
 
 
---Ejecución de prueba de inserción de datos desde json
+--Ejecuciï¿½n de prueba de inserciï¿½n de datos desde json
 exec Sistema.InsertarDatosDesdeJSON
 GO
