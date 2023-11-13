@@ -471,7 +471,7 @@ BEGIN
 				AND s.nro_documento = m.nro_documento
 			);
 
-			--(AÑADIDO) Inserción de Pacientes en el sistema de usuarios
+			-- Inserción de Pacientes en el sistema de usuarios
 			insert into Sistema.Usuario (contraseña,fecha_creacion,id_historia_clinica)
 			select nro_documento,GETDATE(),id_historia_clinica
 			from Sistema.Paciente
@@ -492,32 +492,6 @@ BEGIN
 END
 GO
 
---Ejecución de los SP
-EXEC Normalizacion.cargarTablaPrestador;
-GO
-EXEC Normalizacion.cargarTablaSedes
-GO
-EXEC Normalizacion.cargarMedicos_Especialidad
-GO
-EXEC Normalizacion.cargarPacientes_Domicilio
-GO
-
---Realizamos los select para comprobar las tablas con datos cargados
---(PRUEBA)
-select * from Sistema.Paciente
-select * from Sistema.Usuario
-
-
-select * from Sistema.Medico
-select * from Sistema.Paciente
-select * from Sistema.Prestador
-select * from Sistema.Domicilio
-select * from Sistema.Especialidad
-select * from Sistema.Tipo_Turno
-select * from Sistema.Sede_Atencion
-select * from Sistema.Autorizacion_Estudio
-select * from Sistema.Estado_Turno
-GO
 
 
 ----------PROCEDURES PARA MANEJAR LA INSERCIÓN,MODIFICADO Y BORRADO DE LOS DATOS DE LAS TABLAS----------------------------------------
@@ -610,7 +584,6 @@ BEGIN
 			PRINT 'Se ha insertado ' + CAST(@RowCount AS VARCHAR) + ' paciente.'
 			PRINT 'Se ha completado la inserción de datos de la siguiente tabla: - ''Sistema.Paciente'' -.'
 
-			-----PROPUESTA PARA NO USAR CURSORES (MODIFICADO)
 			set @id_hclinica = SCOPE_IDENTITY()
 
 			insert into Sistema.Usuario (contraseña,fecha_creacion,id_historia_clinica) values (@nro_documento,GETDATE(),@id_hclinica)
@@ -630,37 +603,6 @@ END
 GO
 
 
-
-	--Ejemplo de insercion
-	EXEC ManejoDeDatos.InsertarPacienteConDomicilio
-    @nombre = 'Juan',
-    @apellido = 'Pérez',
-    @apellido_materno = 'Gómez',
-    @fecha_de_nacimiento = '1988-03-15',
-    @tipo_documento = 'DNI',
-    @nro_documento = '98765431',
-    @sexo_biologico = 'Masculino',
-    @genero = 'Hombre',
-    @nacionalidad = 'Argentino',
-    @foto_perfil = 'juan.jpg',
-    @telefono_fijo = '011-2222-3333',
-    @telefono_alternativo = '011-4444-5555',
-    @telefono_laboral = '011-6666-7777',
-    @mail = 'juan.perez@example.com',
-    @calle_y_numero = 'Calle Principal 100',
-    @piso = '1',
-    @departamento = 'A',
-    @codigo_postal = '12345',
-    @pais = 'Argentina',
-    @provincia = 'Buenos Aires',
-    @localidad = 'La Plata'
-GO
-
---Realizamos los select correspondientes.
-select * from Sistema.Paciente
-select * from Sistema.Domicilio
-select * from Sistema.Usuario
-GO	
 --Genero un procedure para modificar algunos datos de los pacientes, en este caso solo dejo modificar los telefonos,el mail y el domicilio.
 
 CREATE OR ALTER PROCEDURE ManejoDeDatos.ModificarDatosPaciente
@@ -745,26 +687,6 @@ END
 GO
 
 
---Ejemplo para modificar los datos del Paciente antes insertados
-
-EXEC ManejoDeDatos.ModificarDatosPaciente
-@id_historia_clinica = 1,   --Aca indico el numero de la historia clinica del paciente a modificar
-@telefono_fijo = '011-8888-8888', -- Nuevo número de teléfono fijo
-@mail = 'juan.perez.nuevo@yahoo.com', -- Nuevo correo electrónico
-@calle_y_numero = 'Nueva Calle 200', -- Nuevo domicilio
-@piso = '2',
-@departamento = 'B',
-@codigo_postal = '54321',
-@pais = 'Argentina',
-@provincia = 'Buenos Aires',
-@localidad = 'La Plata'
-GO
-
-select * from Sistema.Paciente 
-select * from Sistema.Domicilio
-GO
-
-
 --Procedure para eliminar pacientes
 
 CREATE OR ALTER PROCEDURE ManejoDeDatos.EliminarPaciente
@@ -808,21 +730,6 @@ BEGIN
 END
 GO
 
-	--Ejemplo de ejecucion 
-
-EXEC ManejoDeDatos.EliminarPaciente
-@id_historia_clinica = 5   --Aca indico el numero de la historia clinica del paciente a modificar
-GO
-select * from Sistema.Usuario
-select * from Sistema.Paciente 
-select * from Sistema.Domicilio
-GO
-
---MANEJO DE DATOS PARA USUARIOS
-
-select * from Sistema.Usuario
-select * from Sistema.Paciente
-GO
 --Genero procedure para cambiar la contraseña del Usuario 
 
 CREATE OR ALTER PROCEDURE ManejoDeDatos.CambiarContraseñaUsuario
@@ -857,17 +764,6 @@ BEGIN
 END
 GO
 
---- Ejemplo de ejecucion para el cambio de contraseña del usuario
-	
-	
-EXEC ManejoDeDatos.CambiarContraseñaUsuario
-@id_usuario = 1, -- ID del usuario que quiere modificar la contraseña
-@nueva_contraseña = 'contraseña' -- Nueva contraseña
-GO
-
-select * from Sistema.Usuario
-GO
-	
 
 
 --Genero procedure para agregar prestadores
@@ -907,16 +803,6 @@ END
 GO
 
 
--- Ejemplo para insertar un nuevo prestador
-EXEC ManejoDeDatos.InsertarPrestador
-@nombre_prestador = 'Nombre Prestador',
-@plan_prestador = 'Plan'
-GO
-
-
-select * from Sistema.Prestador
-GO
-
 
 --Procedure para eliminar Prestadores
 CREATE OR ALTER PROCEDURE ManejoDeDatos.EliminarPrestador
@@ -952,10 +838,6 @@ BEGIN
 END
 GO
 
-EXEC ManejoDeDatos.EliminarPrestador
-@id_prestador = 21
-GO
-
 
 --Genero un procedure para Especialidades Medicas
 CREATE OR ALTER PROCEDURE ManejoDeDatos.AgregarEspecialidad
@@ -987,15 +869,6 @@ BEGIN
 	END CATCH
 	SET NOCOUNT OFF
 END
-GO
-
---Ejemplo 
-
-EXEC ManejoDeDatos.AgregarEspecialidad
-    @nombre_especialidad = 'CARDIOLOGÍA'  -- nombre de la especialidad
-GO
-
-select * from Sistema.Especialidad
 GO
 
 
@@ -1030,14 +903,7 @@ BEGIN
 	SET NOCOUNT OFF
 END
 GO
-	--Ejemplo de ejecucion
 
-EXEC ManejoDeDatos.EliminarEspecialidad
-    @id_especialidad = 18
-GO
-
-select * from Sistema.Especialidad
-GO
 
 
 --Genero un procedure para insertar Medicos
@@ -1076,17 +942,6 @@ BEGIN
 END
 GO
 
-
--- Ejemplo de ejecucion para insertar un nuevo médico
-EXEC ManejoDeDatos.InsertarMedico
-@nombre = 'Juan',
-@apellido = 'Pérez',
-@numero_matricula = 12345,
-@id_especialidad = 1  -- ID de la especialidad
-GO
-
-SELECT * FROM Sistema.Medico
-GO
 
 
 --Genero un procedure para modificar Medicos
@@ -1128,17 +983,6 @@ END
 GO
 
 
--- Ejemplo de ejecucion para modificar un nuevo médico
-EXEC ManejoDeDatos.ModificarMedico
-@id = 2,
-@nombre = 'Juan',
-@apellido = 'Pérez',
-@numero_matricula = 123456,
-@id_especialidad = 1  -- ID de la especialidad
-GO
-
-SELECT * FROM Sistema.Medico
-GO
 
 
 --Genero un procedure para eliminar Medicos
@@ -1173,15 +1017,6 @@ BEGIN
 END
 GO
 
--- Ejemplo de eliminar un médico por su ID
-	
-EXEC ManejoDeDatos.EliminarMedico
- @id_medico = 2  -- ID del médico a eliminar
-GO
-
-SELECT * FROM Sistema.Medico
-GO
-
 
 
 --------------------CREACIÓN DE SP PARA GENERAR ARCHIVO XML CON LOS TURNOS DE LAS FECHAS SELECCIONADAS-------------------------------
@@ -1202,9 +1037,6 @@ AS BEGIN
 END 
 GO
 
---Ejecución de prueba
-exec Sistema.generarArchivoXml @fecha_inicio = '2023-10-01', @fecha_fin = '2023-10-08';
-GO
 
 -----------------------IMPORTACIÓN DE LOS DATOS DEL ARCHIVO 'CONFIGURACION.JSON'-------------------------------------------
 
@@ -1260,8 +1092,4 @@ BEGIN
     END CATCH; 
 END; 
 
-GO
-
---Ejecución de prueba 
-exec Sistema.InsertarDatosDesdeJSON
 GO
