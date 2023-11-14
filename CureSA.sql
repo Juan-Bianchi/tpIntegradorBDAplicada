@@ -314,11 +314,6 @@ CREATE OR ALTER PROCEDURE Sistema.importarCSV
 @TablaDestino VARCHAR(50)									-- El nombre de la tabla de destino en tu base de datos
 AS
 BEGIN
-	IF NOT EXISTS (SELECT 1 FROM tempdb.sys.objects WHERE name LIKE  @TablaDestino + '[_]%')
-    BEGIN
-        PRINT N'[ERROR] - La tabla de destino no existe en la base de datos.';
-        RETURN
-    END
 	BEGIN TRY												-- Inicio bloque try / catch para realizar la carga en la tabla temporal
 		BEGIN TRANSACTION
 			SET NOCOUNT ON;
@@ -349,7 +344,7 @@ GO
 --SP para cargar datos en Tabla Prestador
 CREATE OR ALTER PROCEDURE Normalizacion.cargarTablaPrestador AS
 BEGIN
-	EXEC Sistema.importarCSV 'C:\importar\Prestador.csv', '##Maestra_prestador' --RUTA ARCHIVO CSV
+	EXEC Sistema.importarCSV 'C:\importar\Prestador.csv', 'dbo.##Maestra_prestador' --RUTA ARCHIVO CSV
 	BEGIN TRY
 		SET NOCOUNT ON;
 		BEGIN TRANSACTION
@@ -385,7 +380,7 @@ BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON;
 		BEGIN TRANSACTION
-			EXEC Sistema.importarCSV 'C:\importar\Sedes.csv', '##Maestra_sedes' --RUTA ARCHIVO CSV
+			EXEC Sistema.importarCSV 'C:\importar\Sedes.csv', 'dbo.##Maestra_sedes' --RUTA ARCHIVO CSV
 			DECLARE @RowCount INT;
 			INSERT INTO Sistema.Sede_Atencion ( nombre_sede, direccion_sede )
 			-- (*2) Referencia de correción de error
@@ -418,7 +413,7 @@ BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON;
 		BEGIN TRANSACTION
-			EXEC Sistema.importarCSV 'C:\importar\Medicos.csv', '##Maestra_medicos' --RUTA ARCHIVO CSV
+			EXEC Sistema.importarCSV 'C:\importar\Medicos.csv', 'dbo.##Maestra_medicos' --RUTA ARCHIVO CSV
 
 			--Inserto en Especialidad
 			INSERT INTO Sistema.Especialidad ( nombre_especialidad )
@@ -469,7 +464,7 @@ BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON;
 		BEGIN TRANSACTION
-			EXEC Sistema.importarCSV 'C:\importar\Pacientes.csv', '##Maestra_pacientes' --RUTA ARCHIVO CSV
+			EXEC Sistema.importarCSV 'C:\importar\Pacientes.csv', 'dbo.##Maestra_pacientes' --RUTA ARCHIVO CSV
 
 			--Inserto en Domicilio
 			INSERT INTO Sistema.Domicilio( calle_y_numero, provincia, localidad)
