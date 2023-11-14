@@ -4,7 +4,7 @@
 ----------------------------------            BASE DE DATOS APLICADA         ----------------------------------------
 -----------------------------------                                        ------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------
---    TRABAJO N� 3 Y 4                          ---------------------------------------------------------------------
+--    TRABAJO Nº 3 Y 4                          ---------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------
 --    FECHA DE ENTREGA:14/11/2023                         ---------------------------------------------------------------------
 --    NUMERO DE GRUPO:    15                    ---------------------------------------------------------------------
@@ -12,7 +12,7 @@
 -- INTEGRANTES                                  ---------------------------------------------------------------------
 
 -- Palmieri Marco 45542385
--- Christian Rodr�guez 37947646
+-- Christian Rodríguez 37947646
 -- Facundo Toloza 40254191
 -- Juan Alberto Bianchi 30475902
 
@@ -25,9 +25,9 @@
 
 
 --CREACION DE BASE DE DATOS
-IF EXISTS (SELECT name FROM sys.databases WHERE name = ‘cure_sa’)
-Begin DROP DATABASE [cure_sa];
-END;
+IF EXISTS (SELECT name FROM sys.databases WHERE name = 'CureSA')
+DROP DATABASE [CureSA]
+GO
 
 create database CureSA
 COLLATE Modern_Spanish_CI_AS
@@ -37,7 +37,7 @@ go
 use CureSA
 go
 
---CREACI�N DE ESQUEMAS
+--CREACIÓN DE ESQUEMAS
 CREATE SCHEMA Sistema; 
 --Esquema para tablas
 go 
@@ -50,7 +50,7 @@ go
 
 
 
----------------CREACI�N DE LAS TABLAS CORRESPONDIENTES DEL SISTEMA,ENTIDADES Y RELACIONES.----------------------------------------------
+---------------CREACIÓN DE LAS TABLAS CORRESPONDIENTES DEL SISTEMA,ENTIDADES Y RELACIONES.----------------------------------------------
 
 drop if exists Sistema.Domicilio
 go
@@ -101,7 +101,7 @@ go
 create table Sistema.Usuario
 (
 	id_usuario int identity (1,1) primary key,
-	contrase�a varchar(30) not null,
+	contrasenia varchar(30) not null,
 	fecha_creacion smalldatetime,
 	id_historia_clinica int,
 	foreign key (id_historia_clinica) references Sistema.paciente(id_historia_clinica),
@@ -228,7 +228,7 @@ go
 
 drop if exists Sistema.Autorizacion_Estudio
 go
---Creaci�n de la tabla 'Autorizacion_Estudio' para importar los datos del JSON.
+--Creación de la tabla 'Autorizacion_Estudio' para importar los datos del JSON.
 CREATE TABLE Sistema.Autorizacion_Estudio ( 
     ID_Estudio INT IDENTITY(1,1) PRIMARY KEY, 
     Area NVARCHAR(20), 
@@ -304,7 +304,7 @@ insert into Sistema.Tipo_Turno (nombre_tipo_turno) values ('Presencial'), ('Virt
 GO
 
 
----------------------------CREACI�N DE STORED PROCEDURES PARA CARGAR LOS ARCHIVOS----------------------------------------------------------------
+---------------------------CREACIÓN DE STORED PROCEDURES PARA CARGAR LOS ARCHIVOS----------------------------------------------------------------
 
 --SP para importar los archivos CSV
 CREATE OR ALTER PROCEDURE Sistema.importarCSV 
@@ -500,7 +500,7 @@ BEGIN
 			);
 
 			-- Inserci�n de Pacientes en el sistema de usuarios
-			insert into Sistema.Usuario (contrase�a,fecha_creacion,id_historia_clinica)
+			insert into Sistema.Usuario (contrasenia,fecha_creacion,id_historia_clinica)
 			select nro_documento,GETDATE(),id_historia_clinica
 			from Sistema.Paciente
 
@@ -522,7 +522,7 @@ GO
 
 
 
-----------PROCEDURES PARA MANEJAR LA INSERCI�N,MODIFICADO Y BORRADO DE LOS DATOS DE LAS TABLAS----------------------------------------
+----------PROCEDURES PARA MANEJAR LA INSERCIÓN,MODIFICADO Y BORRADO DE LOS DATOS DE LAS TABLAS----------------------------------------
 
 --MANEJO DE DATOS PARA PACIENTES
 
@@ -586,8 +586,8 @@ BEGIN
 			END
 			ELSE BEGIN
 				PRINT 'Se ha insertado ' + CAST(@RowCount AS VARCHAR) + ' domicilio.'
-				PRINT 'Se ha completado la inserci�n de datos de la siguiente tabla: - ''Sistema.Domicilio'' -.' 
-				-- Obtener el ID reci�n insertado en Sistema.Domicilio
+				PRINT 'Se ha completado la inserción de datos de la siguiente tabla: - ''Sistema.Domicilio'' -.' 
+				-- Obtener el ID recién insertado en Sistema.Domicilio
 				SET @id_domicilio = SCOPE_IDENTITY()
 			END
 			
@@ -614,7 +614,7 @@ BEGIN
 
 			set @id_hclinica = SCOPE_IDENTITY()
 
-			insert into Sistema.Usuario (contrase�a,fecha_creacion,id_historia_clinica) values (@nro_documento,GETDATE(),@id_hclinica)
+			insert into Sistema.Usuario (contrasenia,fecha_creacion,id_historia_clinica) values (@nro_documento,GETDATE(),@id_hclinica)
 
 			SET @RowCount = @@ROWCOUNT;
 			PRINT 'Se ha insertado ' + CAST(@RowCount AS VARCHAR) + ' usuario.'
@@ -681,7 +681,7 @@ BEGIN
 						@calle_y_numero, @piso, @departamento, @codigo_postal, @pais, @provincia, @localidad
 					)
 
-					-- Obtener el ID reci�n insertado en Sistema.Domicilio
+					-- Obtener el ID recién insertado en Sistema.Domicilio
 					SELECT @id_domicilio = SCOPE_IDENTITY()
 				END
 
@@ -693,7 +693,7 @@ BEGIN
 					id_historia_clinica = @id_historia_clinica
 			END
 
-			-- Actualizar los campos de tel�fono y correo electr�nico del paciente
+			-- Actualizar los campos de teléfono y correo electrónico del paciente
 			UPDATE Sistema.Paciente
 			SET
 				telefono_fijo = ISNULL(@telefono_fijo, telefono_fijo),
@@ -758,12 +758,12 @@ BEGIN
 END
 GO
 
---Genero procedure para cambiar la contrase�a del Usuario 
+--Genero procedure para cambiar la contraseña del Usuario 
 
-CREATE OR ALTER PROCEDURE ManejoDeDatos.CambiarContrase�aUsuario
+CREATE OR ALTER PROCEDURE ManejoDeDatos.CambiarContraseniaUsuario
 (
     @id_usuario INT,
-    @nueva_contrase�a VARCHAR(30)
+    @nueva_contrasenia VARCHAR(30)
 )
 AS
 BEGIN
@@ -771,21 +771,21 @@ BEGIN
 		BEGIN TRANSACTION
 			SET NOCOUNT ON
 			DECLARE @RowCount INT;
-			-- Actualizar la contrase�a del usuario
+			-- Actualizar la contraseña del usuario
 			UPDATE Sistema.Usuario
 			SET
-				contrase�a = @nueva_contrase�a
+				contrasenia = @nueva_contrasenia
 			WHERE
 				id_usuario = @id_usuario
 
 			SET @RowCount = @@ROWCOUNT;
 			IF @RowCount > 0
-				PRINT 'Se ha completado la actualizaci�n en la contrase�a en la siguiente tabla: - ''Sistema.Usuario'' -.'
+				PRINT 'Se ha completado la actualización en la contraseña en la siguiente tabla: - ''Sistema.Usuario'' -.'
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		ROLLBACK TRANSACTION
-		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA MODIFICACI�N DE LA CONTRASE�A');
+		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA MODIFICACIÓN DE LA CONTRASEÑA');
 		PRINT ERROR_LINE() + ERROR_MESSAGE();
 	END CATCH
 	SET NOCOUNT OFF
@@ -816,14 +816,14 @@ BEGIN
 
 			SET @RowCount = @@ROWCOUNT;
 			IF @RowCount > 0 
-				PRINT 'Se ha completado la inserci�n en la siguiente tabla: - ''Sistema.Prestador'' -.'
+				PRINT 'Se ha completado la inserción en la siguiente tabla: - ''Sistema.Prestador'' -.'
 			ELSE
 				PRINT 'El prestador ya se encuentra ingresado en el sistema.'
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		ROLLBACK TRANSACTION
-		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA INSERCI�N DEL PRESTADOR');
+		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA INSERCIÓN DEL PRESTADOR');
 		PRINT ERROR_LINE() + ERROR_MESSAGE();
 	END CATCH
 	SET NOCOUNT OFF
@@ -852,14 +852,14 @@ BEGIN
 
 			SET @RowCount = @@ROWCOUNT;
 			IF @RowCount > 0 
-				PRINT 'Se ha completado la eliminaci�n en la siguiente tabla: - ''Sistema.Prestador'' -.'
+				PRINT 'Se ha completado la eliminación en la siguiente tabla: - ''Sistema.Prestador'' -.'
 			ELSE
 				PRINT 'El prestador no se encuentra ingresado en el sistema.'
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		ROLLBACK TRANSACTION
-		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA ELIMINACI�N DEL PRESTADOR');
+		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA ELIMINACIÓN DEL PRESTADOR');
 		PRINT ERROR_LINE() + ERROR_MESSAGE();
 	END CATCH
 	SET NOCOUNT OFF
@@ -885,14 +885,14 @@ BEGIN
 
 			SET @RowCount = @@ROWCOUNT;
 			IF @RowCount > 0 
-				PRINT 'Se ha completado la inserci�n en la siguiente tabla: - ''Sistema.Especialidad'' -.'
+				PRINT 'Se ha completado la inserción en la siguiente tabla: - ''Sistema.Especialidad'' -.'
 			ELSE
 				PRINT 'La especialidad ya se encuentra ingresada en el sistema.'
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		ROLLBACK TRANSACTION
-		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA INSERCI�N DE LA ESPECIALIDAD');
+		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA INSERCIÓN DE LA ESPECIALIDAD');
 		PRINT ERROR_LINE() + ERROR_MESSAGE();
 	END CATCH
 	SET NOCOUNT OFF
@@ -918,14 +918,14 @@ BEGIN
 
 			SET @RowCount = @@ROWCOUNT;
 			IF @RowCount > 0 
-				PRINT 'Se ha completado la eliminaci�n en la siguiente tabla: - ''Sistema.Especialidad'' -.'
+				PRINT 'Se ha completado la eliminación en la siguiente tabla: - ''Sistema.Especialidad'' -.'
 			ELSE
 				PRINT 'La especialidad no se encuentra ingresada en el sistema.'
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		ROLLBACK TRANSACTION
-		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA ELIMINACI�N DE LA ESPECIALIDAD');
+		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA ELIMINACIÓN DE LA ESPECIALIDAD');
 		PRINT ERROR_LINE() + ERROR_MESSAGE();
 	END CATCH
 	SET NOCOUNT OFF
@@ -956,14 +956,14 @@ BEGIN
 
 			SET @RowCount = @@ROWCOUNT;
 			IF @RowCount > 0 
-				PRINT 'Se ha completado la inserci�n en la siguiente tabla: - ''Sistema.Medico'' -.'
+				PRINT 'Se ha completado la inserción en la siguiente tabla: - ''Sistema.Medico'' -.'
 			ELSE
-				PRINT 'Ya existe un medico con ese numero de matr�cula. Por favor verifique los datos y en caso de corresponder, realice un update.'
+				PRINT 'Ya existe un medico con ese numero de matrícula. Por favor verifique los datos y en caso de corresponder, realice un update.'
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		ROLLBACK TRANSACTION
-		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA INSERCI�N DEL MEDICO');
+		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA INSERCIÓN DEL MEDICO');
 		PRINT ERROR_LINE() + ERROR_MESSAGE();
 	END CATCH
 	SET NOCOUNT OFF
@@ -996,14 +996,14 @@ BEGIN
 
 			SET @RowCount = @@ROWCOUNT;
 			IF @RowCount > 0 
-				PRINT 'Se ha completado la modificaci�n en la siguiente tabla: - ''Sistema.Medico'' -.'
+				PRINT 'Se ha completado la modificación en la siguiente tabla: - ''Sistema.Medico'' -.'
 			ELSE
-				PRINT 'No existe un medico con ese numero de matr�cula. Por favor verifique los datos.'
+				PRINT 'No existe un medico con ese numero de matrícula. Por favor verifique los datos.'
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		ROLLBACK TRANSACTION
-		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA INSERCI�N DEL MEDICO');
+		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA INSERCIÓN DEL MEDICO');
 		PRINT ERROR_LINE() + ERROR_MESSAGE();
 	END CATCH
 	SET NOCOUNT OFF
@@ -1031,14 +1031,14 @@ BEGIN
 
 			SET @RowCount = @@ROWCOUNT;
 			IF @RowCount > 0 
-				PRINT 'Se ha completado la eliminaci�n en la siguiente tabla: - ''Sistema.Medico'' -.'
+				PRINT 'Se ha completado la eliminación en la siguiente tabla: - ''Sistema.Medico'' -.'
 			ELSE
 				PRINT 'El medico no se encuentra ingresado en el sistema.'
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		ROLLBACK TRANSACTION
-		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA ELIMINACI�N DEL MEDICO');
+		PRINT(N'[ERROR] - NO SE HAN PODIDO COMPLETAR LA ELIMINACIÓN DEL MEDICO');
 		PRINT ERROR_LINE() + ERROR_MESSAGE();
 	END CATCH
 	SET NOCOUNT OFF
@@ -1066,9 +1066,9 @@ END
 GO
 
 
------------------------IMPORTACI�N DE LOS DATOS DEL ARCHIVO 'CONFIGURACION.JSON'-------------------------------------------
+-----------------------IMPORTACIÓN DE LOS DATOS DEL ARCHIVO 'CONFIGURACION.JSON'-------------------------------------------
 
---Creaci�n del SP para importar los datos del JSON. 
+--Creación del SP para importar los datos del JSON. 
 CREATE OR ALTER PROCEDURE Sistema.InsertarDatosDesdeJSON 
 AS 
 BEGIN 
