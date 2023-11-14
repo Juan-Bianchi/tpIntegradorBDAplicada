@@ -25,6 +25,8 @@
 
 
 --CREACION DE BASE DE DATOS
+use master
+go
 IF EXISTS (SELECT name FROM sys.databases WHERE name = 'CureSA')
 DROP DATABASE [CureSA]
 GO
@@ -52,7 +54,7 @@ go
 
 ---------------CREACIÓN DE LAS TABLAS CORRESPONDIENTES DEL SISTEMA,ENTIDADES Y RELACIONES.----------------------------------------------
 
-drop if exists Sistema.Domicilio
+drop table if exists Sistema.Domicilio
 go
 CREATE TABLE Sistema.Domicilio
 (
@@ -67,7 +69,7 @@ CREATE TABLE Sistema.Domicilio
 )
 GO
 
-drop if exists Sistema.Paciente
+drop table if exists Sistema.Paciente
 go
 create table Sistema.Paciente
 (
@@ -96,7 +98,7 @@ create table Sistema.Paciente
 )
 go
 
-drop if exists Sistema.Usuario
+drop table if exists Sistema.Usuario
 go
 create table Sistema.Usuario
 (
@@ -108,7 +110,7 @@ create table Sistema.Usuario
 )
 go
 
-drop if exists Sistema.Estudio
+drop table if exists Sistema.Estudio
 go
 create table Sistema.Estudio
 (
@@ -123,7 +125,7 @@ create table Sistema.Estudio
 )
 go
 
-drop if exists Sistema.Prestador
+drop table if exists Sistema.Prestador
 go
 create table Sistema.Prestador
 (
@@ -133,7 +135,7 @@ create table Sistema.Prestador
 )
 go
 
-drop if exists Sistema.Cobertura
+drop table if exists Sistema.Cobertura
 go
 create table Sistema.Cobertura
 (
@@ -148,7 +150,7 @@ create table Sistema.Cobertura
 )
 go
 
-drop if exists Sistema.Estado_Turno
+drop table if exists Sistema.Estado_Turno
 go
 create table Sistema.Estado_Turno 
 ( 
@@ -157,7 +159,7 @@ create table Sistema.Estado_Turno
 ) 
 go
 
-drop if exists Sistema.Tipo_Turno
+drop table if exists Sistema.Tipo_Turno
 go
 create table Sistema.Tipo_Turno 
 ( 
@@ -167,7 +169,7 @@ create table Sistema.Tipo_Turno
 
 go 
 
-drop if exists Sistema.Sede_Atencion
+drop table if exists Sistema.Sede_Atencion
 go
 create table Sistema.Sede_Atencion 
 ( 
@@ -177,7 +179,7 @@ create table Sistema.Sede_Atencion
 ) 
 go 
 
-drop if exists Sistema.Especialidad
+drop table if exists Sistema.Especialidad
 go
 create table Sistema.Especialidad 
 ( 
@@ -186,7 +188,7 @@ create table Sistema.Especialidad
 ) 
 go 
 
-drop if exists Sistema.Medico
+drop table if exists Sistema.Medico
 go
 create table Sistema.Medico
 ( 
@@ -198,7 +200,7 @@ create table Sistema.Medico
 ) 
 go 
 
-drop if exists Sistema.DiasXsede
+drop table if exists Sistema.DiasXsede
 go
 create table Sistema.DiasXsede 
 ( 
@@ -210,7 +212,7 @@ create table Sistema.DiasXsede
 ) 
 go 
 
-drop if exists Sistema.Reserva_Turno_Medico
+drop table if exists Sistema.Reserva_Turno_Medico
 go
 create table Sistema.Reserva_Turno_Medico 
 ( 
@@ -226,7 +228,7 @@ create table Sistema.Reserva_Turno_Medico
 ) 
 go 
 
-drop if exists Sistema.Autorizacion_Estudio
+drop table if exists Sistema.Autorizacion_Estudio
 go
 --Creación de la tabla 'Autorizacion_Estudio' para importar los datos del JSON.
 CREATE TABLE Sistema.Autorizacion_Estudio ( 
@@ -245,7 +247,7 @@ GO
 /*CREAMOS TABLAS TEMPORALES LLAMADAS "MAESTRAS" PARA REALIZAR UNA CARGA DIRECTA DE LOS DATOS DE LOS ARCHIVOS, 
 PARA POSTERIORMENTE HACER EL PREPROCESADO CORRESPONIDENTE PARA LA LIMPIEZA DE LOS DATOS Y AS� PODER CARGARLOS EN LAS TABLAS DE LA BASE DE DATOS*/
 
-drop if exists #Maestra_pacientes
+drop table if exists #Maestra_pacientes
 go
 CREATE TABLE #Maestra_pacientes(
 	nombre varchar(30) COLLATE Modern_Spanish_CI_AS,
@@ -264,7 +266,7 @@ CREATE TABLE #Maestra_pacientes(
 )
 GO
 
-drop if exists #Maestra_prestador
+drop table if exists #Maestra_prestador
 go
 CREATE TABLE #Maestra_prestador (
 	nombre_prestador varchar(30) COLLATE Modern_Spanish_CI_AS,
@@ -274,7 +276,7 @@ CREATE TABLE #Maestra_prestador (
 )
 GO
 
-drop if exists #Maestra_sedes
+drop table if exists #Maestra_sedes
 go
 CREATE TABLE #Maestra_sedes (
 	sede VARCHAR(30) COLLATE Modern_Spanish_CI_AS,
@@ -284,7 +286,7 @@ CREATE TABLE #Maestra_sedes (
 )
 GO
 
-drop if exists #Maestra_medicos
+drop table if exists #Maestra_medicos
 go
 CREATE TABLE #Maestra_medicos(
 nombre varchar(30) COLLATE Modern_Spanish_CI_AS,
