@@ -3,7 +3,7 @@
 USE CureSA
 go
 --Realizamos los select para comprobar las tablas con datos cargados
---Ejecuci�n de los SP
+--Ejecución de los SP
 EXEC Normalizacion.cargarTablaPrestador;
 GO
 EXEC Normalizacion.cargarTablaSedes
@@ -12,6 +12,7 @@ EXEC Normalizacion.cargarMedicos_Especialidad
 GO
 EXEC Normalizacion.cargarPacientes_Domicilio
 GO
+
 
 --Realizamos los select para comprobar las tablas con datos cargados
 
@@ -31,8 +32,8 @@ GO
 	--Ejemplo de insercion
 	EXEC ManejoDeDatos.InsertarPacienteConDomicilio
     @nombre = 'Juan',
-    @apellido = 'P�rez',
-    @apellido_materno = 'G�mez',
+    @apellido = 'Pérez',
+    @apellido_materno = 'Gómez',
     @fecha_de_nacimiento = '1988-03-15',
     @tipo_documento = 'DNI',
     @nro_documento = '98765431',
@@ -65,8 +66,8 @@ GO
 
 EXEC ManejoDeDatos.ModificarDatosPaciente
 @id_historia_clinica = 1,   --Aca indico el numero de la historia clinica del paciente a modificar
-@telefono_fijo = '011-8888-8888', -- Nuevo n�mero de tel�fono fijo
-@mail = 'juan.perez.nuevo@yahoo.com', -- Nuevo correo electr�nico
+@telefono_fijo = '011-8888-8888', -- Nuevo número de teléfono fijo
+@mail = 'juan.perez.nuevo@yahoo.com', -- Nuevo correo electrónico
 @calle_y_numero = 'Nueva Calle 200', -- Nuevo domicilio
 @piso = '2',
 @departamento = 'B',
@@ -95,9 +96,9 @@ GO
 --- Ejemplo de ejecucion para el cambio de contrase�a del usuario
 	
 	
-EXEC ManejoDeDatos.CambiarContrase�aUsuario
+EXEC ManejoDeDatos.CambiarContraseniaUsuario
 @id_usuario = 1, -- ID del usuario que quiere modificar la contrase�a
-@nueva_contrase�a = 'contrase�a' -- Nueva contrase�a
+@nueva_contrasenia = 'contraseña' -- Nueva contrase�a
 GO
 
 select * from Sistema.Usuario
@@ -122,10 +123,10 @@ EXEC ManejoDeDatos.EliminarPrestador
 GO
 
 
---Ejemplo para a�adir especialidad
+--Ejemplo para añadir especialidad
 
 EXEC ManejoDeDatos.AgregarEspecialidad
-    @nombre_especialidad = 'CARDIOLOG�A'  -- nombre de la especialidad
+    @nombre_especialidad = 'CARDIOLOGÍA'  -- nombre de la especialidad
 GO
 
 select * from Sistema.Especialidad
@@ -133,7 +134,7 @@ GO
 
 --Ejemplo para validación en caso de repetición
 EXEC ManejoDeDatos.AgregarEspecialidad
-    @nombre_especialidad = 'CARDIOLOG�A'  -- nombre de la especialidad
+    @nombre_especialidad = 'CARDIOLOGÍA'  -- nombre de la especialidad
 GO
 
 
@@ -151,7 +152,7 @@ GO
 -- Ejemplo de ejecucion para insertar un nuevo m�dico
 EXEC ManejoDeDatos.InsertarMedico
 @nombre = 'Juan',
-@apellido = 'P�rez',
+@apellido = 'Pérez',
 @numero_matricula = 12345,
 @id_especialidad = 1  -- ID de la especialidad
 GO
@@ -164,7 +165,7 @@ GO
 EXEC ManejoDeDatos.ModificarMedico
 @id = 2,
 @nombre = 'Juan',
-@apellido = 'P�rez',
+@apellido = 'Pérez',
 @numero_matricula = 123456,
 @id_especialidad = 1  -- ID de la especialidad
 GO
@@ -184,12 +185,12 @@ SELECT * FROM Sistema.Medico
 GO
 
 
---Ejecuci�n de prueba de xml
+--Ejecución de prueba de xml
 exec Sistema.generarArchivoXml @fecha_inicio = '2023-10-01', @fecha_fin = '2023-10-08';
 GO
 
 
 
---Ejecuci�n de prueba de inserci�n de datos desde json
+--Ejecución de prueba de inserción de datos desde json
 exec Sistema.InsertarDatosDesdeJSON
 GO

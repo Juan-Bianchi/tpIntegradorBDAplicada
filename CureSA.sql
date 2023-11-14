@@ -247,9 +247,9 @@ GO
 /*CREAMOS TABLAS TEMPORALES LLAMADAS "MAESTRAS" PARA REALIZAR UNA CARGA DIRECTA DE LOS DATOS DE LOS ARCHIVOS, 
 PARA POSTERIORMENTE HACER EL PREPROCESADO CORRESPONIDENTE PARA LA LIMPIEZA DE LOS DATOS Y AS� PODER CARGARLOS EN LAS TABLAS DE LA BASE DE DATOS*/
 
-drop table if exists #Maestra_pacientes
+drop table if exists ##Maestra_pacientes
 go
-CREATE TABLE #Maestra_pacientes(
+CREATE TABLE ##Maestra_pacientes(
 	nombre varchar(30) COLLATE Modern_Spanish_CI_AS,
 	apellido varchar(30) COLLATE Modern_Spanish_CI_AS,
 	fecha_de_nacimiento date,
@@ -266,19 +266,19 @@ CREATE TABLE #Maestra_pacientes(
 )
 GO
 
-drop table if exists #Maestra_prestador
+drop table if exists ##Maestra_prestador
 go
-CREATE TABLE #Maestra_prestador (
+CREATE TABLE ##Maestra_prestador (
 	nombre_prestador varchar(30) COLLATE Modern_Spanish_CI_AS,
 	plan_prestador varchar(30) COLLATE Modern_Spanish_CI_AS,
 	vacio char(1) DEFAULT NULL
-	-- (*1) Referencia de correci�n de error
+	-- (*1) Referencia de correción de error
 )
 GO
 
-drop table if exists #Maestra_sedes
+drop table if exists ##Maestra_sedes
 go
-CREATE TABLE #Maestra_sedes (
+CREATE TABLE ##Maestra_sedes (
 	sede VARCHAR(30) COLLATE Modern_Spanish_CI_AS,
 	direccion varchar(100) COLLATE Modern_Spanish_CI_AS,
 	localidad varchar(50) COLLATE Modern_Spanish_CI_AS,
@@ -286,9 +286,9 @@ CREATE TABLE #Maestra_sedes (
 )
 GO
 
-drop table if exists #Maestra_medicos
+drop table if exists ##Maestra_medicos
 go
-CREATE TABLE #Maestra_medicos(
+CREATE TABLE ##Maestra_medicos(
 nombre varchar(30) COLLATE Modern_Spanish_CI_AS,
 apellidos varchar(30) COLLATE Modern_Spanish_CI_AS,
 especialidad varchar(30) COLLATE Modern_Spanish_CI_AS,
@@ -329,7 +329,7 @@ BEGIN
 							FIELDTERMINATOR = '';'',
 							ROWTERMINATOR = ''\n'',
 							FIRSTROW = 2,
-							CODEPAGE = ''65001''				-- C�digo de p�gina de UTF-8
+							CODEPAGE = ''65001''				-- Código de página de UTF-8
 						);';
 			EXEC (@SQL);
 			PRINT('Carga de tabla temporal lista.');
@@ -349,14 +349,14 @@ GO
 --SP para cargar datos en Tabla Prestador
 CREATE OR ALTER PROCEDURE Normalizacion.cargarTablaPrestador AS
 BEGIN
-	EXEC Sistema.importarCSV 'C:\importar\Prestador.csv', '#Maestra_prestador' --RUTA ARCHIVO CSV
+	EXEC Sistema.importarCSV 'C:\importar\Prestador.csv', '##Maestra_prestador' --RUTA ARCHIVO CSV
 	BEGIN TRY
 		SET NOCOUNT ON;
 		BEGIN TRANSACTION
 			DECLARE @RowCount INT;
 			INSERT INTO Sistema.Prestador ( nombre_prestador, plan_prestador )
 			(SELECT nombre_prestador, plan_prestador
-			FROM #Maestra_prestador m 
+			FROM ##Maestra_prestador m 
 			WHERE NOT EXISTS (
 				SELECT 1 FROM Sistema.Prestador p
    			    WHERE p.nombre_prestador = m.nombre_prestador
@@ -374,7 +374,7 @@ BEGIN
 		SET @ErrorMessage = ERROR_MESSAGE()
 		SELECT [ERROR] = N'- NO SE HAN PODIDO CARGAR DATOS A Sistema.Prestador', ErrorMessage= @ErrorMessage
 	END CATCH
-	DROP TABLE #Maestra_prestador
+	DROP TABLE ##Maestra_prestador
 	SET NOCOUNT OFF;
 END
 GO
@@ -385,12 +385,12 @@ BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON;
 		BEGIN TRANSACTION
-			EXEC Sistema.importarCSV 'C:\importar\Sedes.csv', '#Maestra_sedes' --RUTA ARCHIVO CSV
+			EXEC Sistema.importarCSV 'C:\importar\Sedes.csv', '##Maestra_sedes' --RUTA ARCHIVO CSV
 			DECLARE @RowCount INT;
 			INSERT INTO Sistema.Sede_Atencion ( nombre_sede, direccion_sede )
-			-- (*2) Referencia de correci�n de error
+			-- (*2) Referencia de correción de error
 			(SELECT sede, CONCAT(direccion, ' - ', localidad, ' - ', provincia)
-			FROM #Maestra_sedes m 
+			FROM ##Maestra_sedes m 
 			WHERE NOT EXISTS (
 				SELECT 1 FROM Sistema.Sede_Atencion s
    			    WHERE s.direccion_sede = CONCAT(direccion, ' - ', localidad, ' - ', provincia)
@@ -407,7 +407,7 @@ BEGIN
 		SET @ErrorMessage = ERROR_MESSAGE()
 		SELECT [ERROR] = N'- NO SE HAN PODIDO CARGAR DATOS A Sistema.Sedes', ErrorMessage= @ErrorMessage
 	END CATCH
-	DROP TABLE #Maestra_sedes
+	DROP TABLE ##Maestra_sedes
 	SET NOCOUNT OFF;
 END
 GO
@@ -418,17 +418,17 @@ BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON;
 		BEGIN TRANSACTION
-			EXEC Sistema.importarCSV 'C:\importar\Medicos.csv', '#Maestra_medicos' --RUTA ARCHIVO CSV
+			EXEC Sistema.importarCSV 'C:\importar\Medicos.csv', '##Maestra_medicos' --RUTA ARCHIVO CSV
 
 			--Inserto en Especialidad
 			INSERT INTO Sistema.Especialidad ( nombre_especialidad )
 			(
-			SELECT DISTINCT especialidad FROM #Maestra_medicos m
+			SELECT DISTINCT especialidad FROM ##Maestra_medicos m
 			WHERE NOT EXISTS(
 			SELECT 1 FROM Sistema.Especialidad s 
 				WHERE s.nombre_especialidad = m.especialidad)
 			);
-			-- (*3) Referencia de correci�n de error
+			-- (*3) Referencia de correción de error
 
 			DECLARE @RowCount INT;
 			SET @RowCount = @@ROWCOUNT;
@@ -438,7 +438,7 @@ BEGIN
 			--Inserto o modifico en Medico
 			INSERT INTO Sistema.Medico (nombre, apellido, numero_matricula, id_especialidad)
 			SELECT m.nombre, m.apellidos, m.numero_colegiado, e.id_especialidad
-			FROM #Maestra_medicos m
+			FROM ##Maestra_medicos m
 			INNER JOIN Sistema.Especialidad e ON m.especialidad = e.nombre_especialidad
 			WHERE NOT EXISTS (
 				SELECT 1
@@ -458,7 +458,7 @@ BEGIN
 		SET @ErrorMessage = ERROR_MESSAGE()
 		SELECT [ERROR] = N'- NO SE HAN PODIDO CARGAR DATOS A Sistema.Medico', ErrorMessage= @ErrorMessage
 	END CATCH
-	DROP TABLE #Maestra_medicos
+	DROP TABLE ##Maestra_medicos
 	SET NOCOUNT OFF;
 END
 GO
@@ -469,13 +469,13 @@ BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON;
 		BEGIN TRANSACTION
-			EXEC Sistema.importarCSV 'C:\importar\Pacientes.csv', '#Maestra_pacientes' --RUTA ARCHIVO CSV
+			EXEC Sistema.importarCSV 'C:\importar\Pacientes.csv', '##Maestra_pacientes' --RUTA ARCHIVO CSV
 
 			--Inserto en Domicilio
 			INSERT INTO Sistema.Domicilio( calle_y_numero, provincia, localidad)
-			-- (*4) Referencia de correci�n de error
+			-- (*4) Referencia de correción de error
 			(SELECT DISTINCT calle_y_numero, provincia, localidad
-			FROM #Maestra_pacientes m
+			FROM ##Maestra_pacientes m
 			WHERE NOT EXISTS(
 				SELECT 1 FROM Sistema.Domicilio s 
 				WHERE s.calle_y_numero = m.calle_y_numero
@@ -494,7 +494,7 @@ BEGIN
 			nro_documento, sexo_biologico, genero, nacionalidad, telefono_fijo, mail, id_domicilio)
 			SELECT nombre, apellido, fecha_de_nacimiento, tipo_documento,
 			nro_documento, sexo_biologico, genero, nacionalidad, telefono_fijo, mail, d.id_domicilio
-			FROM #Maestra_pacientes m
+			FROM ##Maestra_pacientes m
 			INNER JOIN Sistema.Domicilio d ON m.calle_y_numero = d.calle_y_numero
 			AND m.localidad = d.localidad
 			AND m.provincia = d.provincia
@@ -505,7 +505,7 @@ BEGIN
 				AND s.nro_documento = m.nro_documento
 			);
 
-			-- Inserci�n de Pacientes en el sistema de usuarios
+			-- Inserción de Pacientes en el sistema de usuarios
 			insert into Sistema.Usuario (contrasenia,fecha_creacion,id_historia_clinica)
 			select nro_documento,GETDATE(),id_historia_clinica
 			from Sistema.Paciente
@@ -522,7 +522,7 @@ BEGIN
 		SET @ErrorMessage = ERROR_MESSAGE()
 		SELECT [ERROR] = N'- NO SE HAN PODIDO COMPLETAR LA CARGA DE DATOS', ErrorMessage= @ErrorMessage
 	END CATCH
-	DROP TABLE #Maestra_pacientes
+	DROP TABLE ##Maestra_pacientes
 	SET NOCOUNT OFF;
 END
 GO
@@ -1094,14 +1094,14 @@ BEGIN
         DECLARE @json NVARCHAR(MAX) 
         BEGIN TRANSACTION; 
 
-		CREATE TABLE #datosJSON (COL NVARCHAR(MAX))
+		CREATE TABLE ##datosJSON (COL NVARCHAR(MAX))
 	
 		DECLARE @BULK_INSERT_QUERY AS NVARCHAR(MAX) 
 		, @ilog AS VARCHAR(250)
 		, @registrosAniadidos as SMALLINT;
 	
 		-- Insertar valores del csv en la tabla temporal
-		SET @BULK_INSERT_QUERY = N'BULK INSERT #datosJSON FROM ''C:\importar\Centro_Autorizaciones.Estudios clinicos.json'' WITH ( CODEPAGE = ''65001'')'
+		SET @BULK_INSERT_QUERY = N'BULK INSERT ##datosJSON FROM ''C:\importar\Centro_Autorizaciones.Estudios clinicos.json'' WITH ( CODEPAGE = ''65001'')'
 
 		-- Importar datos a la tabla temporal
 		EXEC sp_sqlexec @BULK_INSERT_QUERY;
@@ -1109,7 +1109,7 @@ BEGIN
 		-- Insertar datos transformados a la tabla correspondiente.
 		WITH datos (area,estudio,prestador,pl,cob,costo,autor) as (
 		SELECT area, estudio, UPPER(prestador), [plan],	cob, costo, autor
-		FROM #datosJSON
+		FROM ##datosJSON
 		CROSS APPLY OPENJSON(COL) with(
 			AREA  VARCHAR(50) '$.Area',
 			ESTUDIO NVARCHAR(100) '$.Estudio',
